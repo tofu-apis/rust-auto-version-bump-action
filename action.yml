@@ -1,0 +1,80 @@
+name: 'Rust Automatic Version Bump Github Action'
+description: 'A Github action to automatically bump the Cargo.toml Rust version of a package'
+inputs:
+  is-push-enabled:
+    description: 'Enables the pushing to the repo with the version bump; otherwise does a dry run'
+    required: true
+  is-tagging-enabled:
+    description: 'Enables the tagging to the repo with the new version; otherwise does a dry run'
+    required: true
+  commit-username:
+    description: 'Username to execute commits to Github with'
+    default: Automatic Version Bump Bot
+  commit-email:
+    description: 'Email to execute commits to Github with'
+    default: automatic-version-bump-bot@tofuapis.com
+outputs:
+  current-package-version:
+    description: "Current (or previous) package version to be bumped"
+    value: ${{ steps.get-current-package-version.outputs.current-package-version }}
+  new-package-version:
+    description: "New package version to be bumped to"
+    value: ${{ steps.get-new-package-version.outputs.new-package-version }}
+runs:
+  using: "composite"
+  steps:
+    - name: Announce auto version bump
+      run: echo "Commencing automatic version bump given checks/tests succeeded!"
+      shell: bash
+    - name: Install latest stable version of rust
+      uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+    # TODO | Consider no longer using cargo-bump since it is somewhat slow to install
+    - name: Install cargo bump
+      run: cargo install cargo-bump
+    - name: Get current cargo package version
+      id: get-current-package-version
+      # Grabs current package version from Cargo.toml
+      run: |
+        CURRENT_PACKAGE_VERSION=$(cargo metadata --format-version=1 --no-deps | jq --raw-output .packages[0].version | tr -d '\n')
+        echo "::set-output name=current-package-version::$CURRENT_PACKAGE_VERSION"
+    # Set up SSH forwarding for subsequent commands (only necessary if repo has private repo dependencies)
+    - name: SSH forwarding setup for fetching from private repos
+      env:
+        SSH_REPO_ACCESS_KEY: ${{ secrets.SSH_REPO_ACCESS_KEY }}
+      if: ${{ env.SSH_REPO_ACCESS_KEY != '' }}
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_REPO_DEPLOY_KEY }}
+    - name: Bump patch version
+      run: cargo bump patch
+    # Opting to update offline to prevent unnecessary downloading of crates / private repos
+    - name: Update the Cargo.lock accordingly
+      run: cargo update --workspace
+    - name: Get new (post-bump package) version
+      id: get-new-package-version
+      run: |
+        NEW_PACKAGE_VERSION=$(cargo metadata --format-version=1 --no-deps | jq --raw-output .packages[0].version | tr -d '\n')
+        echo "::set-output name=new-package-version::$NEW_PACKAGE_VERSION"
+    - name: Automatic commit push to repo
+      if: ${{ github.event.inputs.is-push-enabled == true }}
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}
+        commit_user_name: ${{ github.event.inputs.commit-username }}
+        commit_user_email: ${{ github.event.inputs.commit-email }}
+    - name: Automatic Github tag creation
+      if: ${{ github.event.inputs.is-tagging-enabled == true }}
+      id: create_github_tag
+      uses: mathieudutour/github-tag-action@v6.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        custom_tag: ${{ steps.get-new-package-version.outputs.new-package-version }}
+        tag_prefix: v
+        dry_run: false
+    - name: Output tagging logs (for debugging)
+      run: |
+        echo "New Tag: ${{ steps.create_github_tag.outputs.new_tag }}"
+        echo "Changelog: ${{ steps.create_github_tag.outputs.changelog }}"
