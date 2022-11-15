@@ -34,12 +34,14 @@ runs:
     # TODO | Consider no longer using cargo-bump since it is somewhat slow to install
     - name: Install cargo bump
       run: cargo install cargo-bump
+      shell: bash
     - name: Get current cargo package version
       id: get-current-package-version
       # Grabs current package version from Cargo.toml
       run: |
         CURRENT_PACKAGE_VERSION=$(cargo metadata --format-version=1 --no-deps | jq --raw-output .packages[0].version | tr -d '\n')
         echo "::set-output name=current-package-version::$CURRENT_PACKAGE_VERSION"
+      shell: bash
     # Set up SSH forwarding for subsequent commands (only necessary if repo has private repo dependencies)
     - name: SSH forwarding setup for fetching from private repos
       env:
@@ -50,14 +52,17 @@ runs:
         ssh-private-key: ${{ secrets.SSH_REPO_DEPLOY_KEY }}
     - name: Bump patch version
       run: cargo bump patch
+      shell: bash
     # Opting to update offline to prevent unnecessary downloading of crates / private repos
     - name: Update the Cargo.lock accordingly
       run: cargo update --workspace
+      shell: bash
     - name: Get new (post-bump package) version
       id: get-new-package-version
       run: |
         NEW_PACKAGE_VERSION=$(cargo metadata --format-version=1 --no-deps | jq --raw-output .packages[0].version | tr -d '\n')
         echo "::set-output name=new-package-version::$NEW_PACKAGE_VERSION"
+      shell: bash
     - name: Automatic commit push to repo
       if: ${{ github.event.inputs.is-push-enabled == true }}
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -78,3 +83,4 @@ runs:
       run: |
         echo "New Tag: ${{ steps.create_github_tag.outputs.new_tag }}"
         echo "Changelog: ${{ steps.create_github_tag.outputs.changelog }}"
+      shell: bash
