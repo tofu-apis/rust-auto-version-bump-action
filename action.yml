@@ -73,6 +73,8 @@ runs:
     - name: Dry run for "Automatic commit push to repo"
       if: ${{ github.event.inputs.is-push-enabled == false }}
       run: |
+        echo "Executing dry run since commit push is disabled"
+        echo "is-push-enabled value: ${{ github.event.inputs.is-push-enabled }}"
         echo "Commit Message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}"
         echo "Commit Username: ${{ github.event.inputs.commit-username }}"
         echo "Commit Email: ${{ github.event.inputs.commit-email }}"
@@ -88,6 +90,8 @@ runs:
     - name: Dry run for "Automatic Github tag creation"
       if: ${{ github.event.inputs.is-tagging-enabled == false }}
       run: |
+        echo "Executing dry run since tagging is disabled"
+        echo "is-tagging-enabled value: ${{ github.event.inputs.is-tagging-enabled }}"
         echo "Custom Tag: ${{ steps.get-new-package-version.outputs.new-package-version }}"
       shell: bash
     - name: Automatic Github tag creation
