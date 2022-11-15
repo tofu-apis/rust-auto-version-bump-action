@@ -70,6 +70,18 @@ runs:
         echo $NEW_PACKAGE_VERSION
         echo "new-package-version=$NEW_PACKAGE_VERSION" >> $GITHUB_OUTPUT
       shell: bash
+    # TODO | To be removed  but for debugging purposes
+    - name: Output inputs for debugging purposes
+      run: |
+        echo "is-push-enabled value: ${{ inputs.is-push-enabled }}"
+        echo "is-tagging-enabled value: ${{ inputs.is-tagging-enabled }}"
+        echo "Commit Username: ${{ inputs.commit-username }}"
+        echo "Commit Email: ${{ inputs.commit-email }}"
+        echo "is-push-enabled value: ${{ github.event.inputs.is-push-enabled }}"
+        echo "is-tagging-enabled value: ${{ github.event.inputs.is-tagging-enabled }}"
+        echo "Commit Username: ${{ github.event.inputs.commit-username }}"
+        echo "Commit Email: ${{ github.event.inputs.commit-email }}"
+      shell: bash
     - name: Dry run for "Automatic commit push to repo"
       if: ${{ inputs.is-push-enabled == false }}
       run: |
