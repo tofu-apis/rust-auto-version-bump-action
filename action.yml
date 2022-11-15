@@ -28,9 +28,9 @@ runs:
       shell: bash
     - name: Install latest stable version of rust
       uses: actions-rs/toolchain@v1
-        with:
-            toolchain: stable
-            override: true
+      with:
+        toolchain: stable
+        override: true
     # TODO | Consider no longer using cargo-bump since it is somewhat slow to install
     - name: Install cargo bump
       run: cargo install cargo-bump
