@@ -36,6 +36,10 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v3.1.0
+    # TODO | Add in an additional step to check the SHA from the commit and ensure it's the latest
+    # TODO | commit and that there are no new commits on top. This will defensively prevent tagging
+    # TODO | a version that includes commits that hasn't passed CI/CD yet.
     - name: Announce auto version bump
       run: echo "Commencing automatic version bump given checks/tests succeeded!"
       shell: bash
