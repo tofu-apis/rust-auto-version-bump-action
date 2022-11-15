@@ -84,6 +84,22 @@ runs:
         echo "Commit Username: ${{ inputs.commit-username }}"
         echo "Commit Email: ${{ inputs.commit-email }}"
       shell: bash
+    - name: Push Enabled True Check
+      if: ${{ inputs.is-push-enabled == true }}
+      run: echo "is-push-enabled is [true]"
+      shell: bash
+    - name: Push Enabled False Check
+      if: ${{ inputs.is-push-enabled == false }}
+      run: echo "is-push-enabled is [true]"
+      shell: bash
+    - name: Push Enabled True String Check
+      if: ${{ inputs.is-push-enabled == 'true' }}
+      run: echo "is-push-enabled is ['true']"
+      shell: bash
+    - name: Push Enabled False String Check
+      if: ${{ inputs.is-push-enabled == 'false' }}
+      run: echo "is-push-enabled is ['false']"
+      shell: bash
     - name: Dry run for "Automatic commit push to repo"
       if: ${{ inputs.is-push-enabled == false }}
       run: |
