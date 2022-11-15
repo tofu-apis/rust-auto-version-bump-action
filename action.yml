@@ -104,7 +104,7 @@ runs:
       shell: bash
     - name: Automatic Github tag creation
       # Check if commit push succeeds, creates a commit since no new changes are introduced prior to auto-commit, and tagging is enabled.
-      if: ${{ steps.commit-push.outcome == 'success' && steps.commit-push.outputs.changed_detected == 'false' && inputs.is-tagging-enabled == 'true' }}
+      if: ${{ steps.commit-push.outcome == 'success' && steps.commit-push.outputs.changes_detected == 'false' && inputs.is-tagging-enabled == 'true' }}
       id: create_github_tag
       uses: mathieudutour/github-tag-action@v6.1
       with:
