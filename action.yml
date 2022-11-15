@@ -103,12 +103,14 @@ runs:
         echo "Custom Tag: ${{ steps.get-new-package-version.outputs.new-package-version }}"
       shell: bash
     - name: Automatic Github tag creation
-      if: ${{ steps.commit-push.outcome == 'success' && inputs.is-tagging-enabled == 'true' }}
+      # Check if commit push succeeds, creates a commit since no new changes are introduced prior to auto-commit, and tagging is enabled.
+      if: ${{ steps.commit-push.outcome == 'success' && steps.commit-push.outputs.changed_detected == 'false' && inputs.is-tagging-enabled == 'true' }}
       id: create_github_tag
       uses: mathieudutour/github-tag-action@v6.1
       with:
         github_token: ${{ inputs.github-token }}
         custom_tag: ${{ steps.get-new-package-version.outputs.new-package-version }}
+        commit_sha: ${{ steps.commit-push.outputs.commit_hash }}
         tag_prefix: v
         dry_run: false
     - name: Output tagging logs (for debugging)
