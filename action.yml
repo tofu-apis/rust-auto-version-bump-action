@@ -77,6 +77,13 @@ runs:
         commit_message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}
         commit_user_name: ${{ github.event.inputs.commit-username }}
         commit_user_email: ${{ github.event.inputs.commit-email }}
+    - name: Dry run for "Automatic commit push to repo"
+      if: ${{ github.event.inputs.is-push-enabled == false }}
+      run: |
+        echo "Commit Message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}"
+        echo "Commit Username: ${{ github.event.inputs.commit-username }}"
+        echo "Commit Email: ${{ github.event.inputs.commit-email }}"
+      shell: bash
     - name: Automatic Github tag creation
       if: ${{ github.event.inputs.is-tagging-enabled == true }}
       id: create_github_tag
@@ -86,6 +93,11 @@ runs:
         custom_tag: ${{ steps.get-new-package-version.outputs.new-package-version }}
         tag_prefix: v
         dry_run: false
+    - name: Dry run for "Automatic Github tag creation"
+      if: ${{ github.event.inputs.is-tagging-enabled == false }}
+      run: |
+        echo "Custom Tag: ${{ steps.get-new-package-version.outputs.new-package-version }}"
+      shell: bash
     - name: Output tagging logs (for debugging)
       run: |
         echo "New Tag: ${{ steps.create_github_tag.outputs.new_tag }}"
