@@ -71,31 +71,31 @@ runs:
         echo "new-package-version=$NEW_PACKAGE_VERSION" >> $GITHUB_OUTPUT
       shell: bash
     - name: Dry run for "Automatic commit push to repo"
-      if: ${{ github.event.inputs.is-push-enabled == false }}
+      if: ${{ inputs.is-push-enabled == false }}
       run: |
         echo "Executing dry run since commit push is disabled"
-        echo "is-push-enabled value: ${{ github.event.inputs.is-push-enabled }}"
+        echo "is-push-enabled value: ${{ inputs.is-push-enabled }}"
         echo "Commit Message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}"
-        echo "Commit Username: ${{ github.event.inputs.commit-username }}"
-        echo "Commit Email: ${{ github.event.inputs.commit-email }}"
+        echo "Commit Username: ${{ inputs.commit-username }}"
+        echo "Commit Email: ${{ inputs.commit-email }}"
       shell: bash
     - name: Automatic commit push to repo
-      if: ${{ github.event.inputs.is-push-enabled == true }}
+      if: ${{ inputs.is-push-enabled == true }}
       id: commit-push
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}
-        commit_user_name: ${{ github.event.inputs.commit-username }}
-        commit_user_email: ${{ github.event.inputs.commit-email }}
+        commit_user_name: ${{ inputs.commit-username }}
+        commit_user_email: ${{ inputs.commit-email }}
     - name: Dry run for "Automatic Github tag creation"
-      if: ${{ github.event.inputs.is-tagging-enabled == false }}
+      if: ${{ inputs.is-tagging-enabled == false }}
       run: |
         echo "Executing dry run since tagging is disabled"
-        echo "is-tagging-enabled value: ${{ github.event.inputs.is-tagging-enabled }}"
+        echo "is-tagging-enabled value: ${{ inputs.is-tagging-enabled }}"
         echo "Custom Tag: ${{ steps.get-new-package-version.outputs.new-package-version }}"
       shell: bash
     - name: Automatic Github tag creation
-      if: ${{ steps.commit-push.outcome == 'success' && github.event.inputs.is-tagging-enabled == true }}
+      if: ${{ steps.commit-push.outcome == 'success' && inputs.is-tagging-enabled == true }}
       id: create_github_tag
       uses: mathieudutour/github-tag-action@v6.0
       with:
