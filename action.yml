@@ -19,7 +19,7 @@ inputs:
     # TODO | Boolean type is not yet supported in composite actions
     # type: boolean
   is-tagging-enabled:
-    description: 'Enables the tagging to the repo with the new version; otherwise does a dry run'
+    description: 'Enables the tagging to the repo with the new version; otherwise does a dry run. Note that enabling this requires "is-push-enabled" to be enabled as well.'
     required: true
     # TODO | Boolean type is not yet supported in composite actions
     # type: boolean
