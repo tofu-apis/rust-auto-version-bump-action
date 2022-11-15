@@ -4,20 +4,26 @@ inputs:
   commit-username:
     description: 'Username to execute commits to Github with'
     default: Automatic Version Bump Bot
+    type: string
   commit-email:
     description: 'Email to execute commits to Github with'
     default: automatic-version-bump-bot@tofuapis.com
+    type: string
   github-token:
     description: '[SECRET] Github Token for creating tags (Should generally always be from secrets.GITHUB_TOKEN)'
     required: true
+    type: string
   is-push-enabled:
     description: 'Enables the pushing to the repo with the version bump; otherwise does a dry run'
     required: true
+    type: boolean
   is-tagging-enabled:
     description: 'Enables the tagging to the repo with the new version; otherwise does a dry run'
     required: true
+    type: boolean
   ssh-repo-access-key:
     description: '[SECRET] Github SSH Key for accessing a given repo. This is used for accessing private repos that are dependencies in Cargo.toml'
+    type: string
 outputs:
   current-package-version:
     description: "Current (or previous) package version to be bumped"
@@ -77,10 +83,6 @@ runs:
         echo "is-tagging-enabled value: ${{ inputs.is-tagging-enabled }}"
         echo "Commit Username: ${{ inputs.commit-username }}"
         echo "Commit Email: ${{ inputs.commit-email }}"
-        echo "is-push-enabled value: ${{ github.event.inputs.is-push-enabled }}"
-        echo "is-tagging-enabled value: ${{ github.event.inputs.is-tagging-enabled }}"
-        echo "Commit Username: ${{ github.event.inputs.commit-username }}"
-        echo "Commit Email: ${{ github.event.inputs.commit-email }}"
       shell: bash
     - name: Dry run for "Automatic commit push to repo"
       if: ${{ inputs.is-push-enabled == false }}
