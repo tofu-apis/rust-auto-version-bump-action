@@ -1,18 +1,23 @@
 name: 'Rust Automatic Version Bump Github Action'
 description: 'A Github action to automatically bump the Cargo.toml Rust version of a package'
 inputs:
-  is-push-enabled:
-    description: 'Enables the pushing to the repo with the version bump; otherwise does a dry run'
-    required: true
-  is-tagging-enabled:
-    description: 'Enables the tagging to the repo with the new version; otherwise does a dry run'
-    required: true
   commit-username:
     description: 'Username to execute commits to Github with'
     default: Automatic Version Bump Bot
   commit-email:
     description: 'Email to execute commits to Github with'
     default: automatic-version-bump-bot@tofuapis.com
+  github-token:
+    description: '[SECRET] Github Token for creating tags (Should generally always be from secrets.GITHUB_TOKEN)'
+    required: true
+  is-push-enabled:
+    description: 'Enables the pushing to the repo with the version bump; otherwise does a dry run'
+    required: true
+  is-tagging-enabled:
+    description: 'Enables the tagging to the repo with the new version; otherwise does a dry run'
+    required: true
+  ssh-repo-access-key:
+    description: '[SECRET] Github SSH Key for accessing a given repo. This is used for accessing private repos that are dependencies in Cargo.toml'
 outputs:
   current-package-version:
     description: "Current (or previous) package version to be bumped"
@@ -45,11 +50,11 @@ runs:
     # Set up SSH forwarding for subsequent commands (only necessary if repo has private repo dependencies)
     - name: SSH forwarding setup for fetching from private repos
       env:
-        SSH_REPO_ACCESS_KEY: ${{ secrets.SSH_REPO_ACCESS_KEY }}
-      if: ${{ env.SSH_REPO_ACCESS_KEY != '' }}
+        SSH_REPO_ACCESS_KEY: ${{ inputs.ssh-repo-access-key }}
+      if: ${{ inputs.ssh-repo-access-key != '' }}
       uses: webfactory/ssh-agent@v0.5.4
       with:
-        ssh-private-key: ${{ secrets.SSH_REPO_DEPLOY_KEY }}
+        ssh-private-key: ${{ inputs.ssh-repo-access-key }}
     - name: Bump patch version
       run: cargo bump patch
       shell: bash
@@ -75,7 +80,7 @@ runs:
       id: create_github_tag
       uses: mathieudutour/github-tag-action@v6.0
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github-token }}
         custom_tag: ${{ steps.get-new-package-version.outputs.new-package-version }}
         tag_prefix: v
         dry_run: false
