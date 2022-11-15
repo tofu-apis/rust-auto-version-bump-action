@@ -45,7 +45,8 @@ runs:
       # Grabs current package version from Cargo.toml
       run: |
         CURRENT_PACKAGE_VERSION=$(cargo metadata --format-version=1 --no-deps | jq --raw-output .packages[0].version | tr -d '\n')
-        echo "::set-output name=current-package-version::$CURRENT_PACKAGE_VERSION"
+        echo $CURRENT_PACKAGE_VERSION
+        echo "current-package-version=$CURRENT_PACKAGE_VERSION" >> $GITHUB_OUTPUT
       shell: bash
     # Set up SSH forwarding for subsequent commands (only necessary if repo has private repo dependencies)
     - name: SSH forwarding setup for fetching from private repos
@@ -66,7 +67,8 @@ runs:
       id: get-new-package-version
       run: |
         NEW_PACKAGE_VERSION=$(cargo metadata --format-version=1 --no-deps | jq --raw-output .packages[0].version | tr -d '\n')
-        echo "::set-output name=new-package-version::$NEW_PACKAGE_VERSION"
+        echo $NEW_PACKAGE_VERSION
+        echo "new-package-version=$NEW_PACKAGE_VERSION" >> $GITHUB_OUTPUT
       shell: bash
     - name: Automatic commit push to repo
       if: ${{ github.event.inputs.is-push-enabled == true }}
