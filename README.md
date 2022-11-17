@@ -46,7 +46,7 @@ New package version to be bumped to
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: tofu-apis/rust-auto-version-bump-action@v0.0.30
+      - uses: tofu-apis/rust-auto-version-bump-action@v0.0.31
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           is-push-enabled: true

@@ -111,6 +111,9 @@ runs:
     - name: Automatic commit push to repo
       if: ${{ inputs.is-push-enabled == 'true' }}
       id: commit-push
+      # Considering the job successful since the bump is not critical and
+      # may fail if a new commit occurs between checkout and the bump commit
+      continue-on-error: true
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Automatic Version Bump from v${{ steps.get-current-package-version.outputs.current-package-version }} to v${{ steps.get-new-package-version.outputs.new-package-version }}
