@@ -47,6 +47,14 @@ runs:
         echo "Last Commit Hash: $LAST_COMMIT_HASH"
         echo "last-commit-hash=$LAST_COMMIT_HASH" >> $GITHUB_OUTPUT
       shell: bash
+    - name: Debugging message for commit hashes
+      run:
+        echo "${{ steps.get-last-commit-hash.outputs.last-commit-hash }}"
+        echo "${{ github.sha }}"
+        echo "${{ steps.get-last-commit-hash.outputs.last-commit-hash == github.sha }}"
+        echo "${{ ! steps.get-last-commit-hash.outputs.last-commit-hash == github.sha }}"
+        echo "${{ steps.get-last-commit-hash.outputs.last-commit-hash != github.sha }}"
+      shell: bash
     - name: Exit if latest commit hash from checkout does not match commit hash from commit. This indicates a change came in after the commit triggering this workflow and we should therefore not bump version and auto-tag the version including the additional commit.
       if: ${{ steps.get-last-commit-hash.outputs.last-commit-hash != github.sha }}
       run: |
