@@ -48,7 +48,7 @@ runs:
         echo "last-commit-hash=$LAST_COMMIT_HASH" >> $GITHUB_OUTPUT
       shell: bash
     - name: Debugging message for commit hashes
-      run:
+      run: |
         echo "${{ steps.get-last-commit-hash.outputs.last-commit-hash }}"
         echo "${{ github.sha }}"
         echo "${{ steps.get-last-commit-hash.outputs.last-commit-hash == github.sha }}"
