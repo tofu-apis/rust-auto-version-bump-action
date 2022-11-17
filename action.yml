@@ -38,7 +38,8 @@ runs:
   steps:
     # Checkout with the latest for the given branch, so we can determine if there are any new commits.
     - uses: actions/checkout@v3.1.0
-      ref: ${{ github.ref_name }}
+      with:
+        ref: ${{ github.ref_name }}
     # TODO | Add in an additional step to check the SHA from the commit and ensure it's the latest
     # TODO | commit and that there are no new commits on top. This will defensively prevent tagging
     # TODO | a version that includes commits that hasn't passed CI/CD yet.
